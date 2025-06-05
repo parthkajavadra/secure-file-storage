@@ -1,10 +1,10 @@
 from rest_framework import generics, permissions
 from django.contrib.auth.models import User
 from rest_framework.serializers import ModelSerializer
-from rest_framework.permissions import AllowAny
-from .models import File
-from .UploadSerializer import FileUploadSerializer
-
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from storage.models import File
+from .UploadSerializer import FileUploadSerializer, FileSerializer
+from django.db.models import Q 
 
 class UserSerializer(ModelSerializer):
     class Meta:
@@ -35,4 +35,16 @@ class FileListView(generics.ListAPIView):
     
     def get_queryset(self):
         return File.objects.filter(owner=self.request.user)
+    
+class FileListView(generics.ListAPIView):
+    serializer_class = FileSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        return File.objects.filter(
+            Q(owner=user) |
+            Q(access_level="public") |
+            Q(shared_with=user)
+        ).distinct()
     
