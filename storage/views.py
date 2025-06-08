@@ -10,6 +10,10 @@ from django.http import FileResponse, Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from .utils.virus_scan import scan_file_for_virus
+from rest_framework.exceptions import ValidationError
+from django.core.files.storage import default_storage
+from .permissions import IsOwnerSharedOrPublic
 
 class UserSerializer(ModelSerializer):
     class Meta:
@@ -33,6 +37,21 @@ class FileUploadView(generics.CreateAPIView):
     queryset = File.objects.all()
     serializer_class = FileUploadSerializer
     permission_classes = [permissions.IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        file = self.request.FILES["file"]
+        # Save temp to scan
+        temp_path = f"/tmp/{file.name}"
+        with open (temp_path, "wb+") as temp_file:
+            for chunk in file.chunks():
+                temp_file.write(chunk)     
+        # Scan file
+        scan_result = scan_file_for_virus(temp_path)
+        if scan_result:
+            raise ValidationError("File upload rejected due to virus detection!")
+        
+        serializer.save(owner=self.request.user)
+
     
 class FileListView(generics.ListAPIView):
     serializer_class = FileUploadSerializer
