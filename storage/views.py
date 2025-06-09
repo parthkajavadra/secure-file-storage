@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404
 from .utils.virus_scan import scan_file_for_virus
 from rest_framework.exceptions import ValidationError
 from django.core.files.storage import default_storage
+from .tasks import async_scan_file
 from .permissions import IsOwnerSharedOrPublic
 
 class UserSerializer(ModelSerializer):
@@ -44,23 +45,27 @@ class FileUploadView(generics.CreateAPIView):
         temp_path = f"/tmp/{file.name}"
         with open (temp_path, "wb+") as temp_file:
             for chunk in file.chunks():
-                temp_file.write(chunk)     
+                temp_file.write(chunk)   
+                  
+        async_scan_file.delay(temp_path)
         # Scan file
         scan_result = scan_file_for_virus(temp_path)
         if scan_result:
             raise ValidationError("File upload rejected due to virus detection!")
         
         serializer.save(owner=self.request.user)
+       
+       
 
     
-class FileListView(generics.ListAPIView):
+class UserFileListView(generics.ListAPIView):
     serializer_class = FileUploadSerializer
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
         return File.objects.filter(owner=self.request.user)
     
-class FileListView(generics.ListAPIView):
+class AccessibleFileListView(generics.ListAPIView):
     serializer_class = FileSerializer
     permission_classes = [IsAuthenticated]
     
@@ -73,7 +78,7 @@ class FileListView(generics.ListAPIView):
         ).distinct()
         
 class FileDownloadView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated,IsOwnerSharedOrPublic]
     
     def get(self, reuqest, file_id):
         user = reuqest.user
@@ -106,3 +111,4 @@ class ShareFileView(generics.GenericAPIView):
         file.save()
         
         return Response({"message": f'File shared with {recipient_user.username} successfully!'}, status=status.HTTP_200_OK)
+    
