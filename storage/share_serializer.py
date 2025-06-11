@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from storage.models import File
+from .models import PublicShareLink
+from django.utils import timezone
+from datetime import timedelta
 
 class FileShareSerializer(serializers.Serializer):
     file_id = serializers.IntegerField()
@@ -27,3 +30,17 @@ class FileShareSerializer(serializers.Serializer):
         file = self.validated_data["file"]
         shared_user = self.validated_data["shared_user"]
         file.shared_with.add(shared_user)
+        
+
+class PublicShareLinkCreateSerializer(serializers.ModelSerializer):
+    expires_in_minutes = serializers.IntegerField(write_only=True)
+    
+    class Meta:
+        model = PublicShareLink
+        fields = ["expires_in_minutes"]
+        
+    def create(self, validated_date):
+        file = self.context["file"]
+        expires_in = validated_date.pop("expires_in_minutes")
+        expires_at = timezone.now() + timedelta(minutes=expires_in)
+        return PublicShareLink.objects.create(file=file,expires_at=expires_at)

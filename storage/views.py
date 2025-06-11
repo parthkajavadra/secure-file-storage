@@ -2,9 +2,9 @@ from rest_framework import generics, permissions, status
 from django.contrib.auth.models import User
 from rest_framework.serializers import ModelSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from storage.models import File
+from storage.models import File, PublicShareLink
 from .UploadSerializer import FileUploadSerializer, FileSerializer
-from .share_serializer import FileShareSerializer
+from .share_serializer import FileShareSerializer, PublicShareLinkCreateSerializer
 from django.db.models import Q 
 from django.http import FileResponse, Http404
 from rest_framework.views import APIView
@@ -15,6 +15,9 @@ from rest_framework.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from .tasks import async_scan_file
 from .permissions import IsOwnerSharedOrPublic
+from django.urls import reverse
+
+
 
 class UserSerializer(ModelSerializer):
     class Meta:
@@ -112,3 +115,28 @@ class ShareFileView(generics.GenericAPIView):
         
         return Response({"message": f'File shared with {recipient_user.username} successfully!'}, status=status.HTTP_200_OK)
     
+class GeneratePublicLinkView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, file_id):
+        file = get_object_or_404(File, id=file_id, owner=request.user)
+        serializer = PublicShareLinkCreateSerializer(data=request.data, context={"file":file})
+        if serializer.is_valid():
+            share_link = serializer.save()
+            relative_url = reverse("public-file.download", kwargs={"token": str(share_link.token)})
+            link_url = request.build_absolute_uri(relative_url)
+            return Response({"share_link": link_url}, status=status.HTTP_201_CREATED)
+        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+    
+class PublicFileDownloadView(APIView):
+    permission_classes = []
+    
+    def get(self, request, token):
+        try: 
+            link = PublicShareLink.objects.select_related("file").get(token=token)
+            if link.is_expired():
+                raise Http404("Link expired")
+            return FileResponse(link.file.file.open("rb"), as_attachment=True, filename=link.file.file.name.split("/")[-1])
+        except PublicShareLink.DoesNotExist:
+            raise Http404("Invalid link")
+        
