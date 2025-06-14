@@ -1,0 +1,4 @@
+2025-06-13 11:24:49,569 [ERROR] Testing error logger
+2025-06-13 13:16:40,558 [ERROR] [SERVER ERROR] 2025-06-13 13:16:40.558692+00:00 | Path: /api/storage/share/3/ | Method: POST | IP: 127.0.0.1 |User: testuser1 | Exception: name 'ip' is not defined
+2025-06-13 13:17:12,095 [ERROR] [SERVER ERROR] 2025-06-13 13:17:12.095663+00:00 | Path: /api/storage/share/3/ | Method: POST | IP: 127.0.0.1 |User: testuser1 | Exception: name 'ip' is not defined
+2025-06-13 13:22:55,005 [ERROR] [SERVER ERROR] 2025-06-13 13:22:55.005631+00:00 | Path: /api/storage/share/3/ | Method: POST | IP: 127.0.0.1 |User: testuser1 | Exception: name 'user_agent' is not defined

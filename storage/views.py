@@ -16,8 +16,15 @@ from django.core.files.storage import default_storage
 from .tasks import async_scan_file
 from .permissions import IsOwnerSharedOrPublic
 from django.urls import reverse
+from rest_framework.throttling import AnonRateThrottle,UserRateThrottle
+from .throttles import PublicLinkThrottle
+import logging
+from .utils.request_utils import get_client_ip
 
 
+
+
+access_logger = logging.getLogger("access_logger")
 
 class UserSerializer(ModelSerializer):
     class Meta:
@@ -58,7 +65,6 @@ class FileUploadView(generics.CreateAPIView):
         
         serializer.save(owner=self.request.user)
        
-       
 
     
 class UserFileListView(generics.ListAPIView):
@@ -81,10 +87,10 @@ class AccessibleFileListView(generics.ListAPIView):
         ).distinct()
         
 class FileDownloadView(APIView):
-    permission_classes = [permissions.IsAuthenticated,IsOwnerSharedOrPublic]
+    permission_classes = [IsAuthenticated]
     
-    def get(self, reuqest, file_id):
-        user = reuqest.user
+    def get(self, request, file_id):
+        user = request.user
         file = get_object_or_404(File, id = file_id)
         
         if file.owner == user or file.access_level == "public" or user in file.shared_with.all():
@@ -117,26 +123,54 @@ class ShareFileView(generics.GenericAPIView):
     
 class GeneratePublicLinkView(APIView):
     permission_classes = [IsAuthenticated]
+    throttle_classes = [UserRateThrottle]
     
     def post(self, request, file_id):
-        file = get_object_or_404(File, id=file_id, owner=request.user)
+        try:
+            file = get_object_or_404(File, id=file_id, owner=request.user)
+            ip = request.META.get("REMOTE_ADDR", "")
+            user_agent = request.META.get("HTTP_USER_AGENT", "Unknown")
+            
+        except Http404:
+            access_logger.warning(
+                f"[Unauthorized Access Attempt] User: {request.user.username} | IP: {get_client_ip(request)} | File ID: {file_id} | Reson: Not owner"
+            )
+            raise
         serializer = PublicShareLinkCreateSerializer(data=request.data, context={"file":file})
         if serializer.is_valid():
             share_link = serializer.save()
             relative_url = reverse("public-file.download", kwargs={"token": str(share_link.token)})
             link_url = request.build_absolute_uri(relative_url)
+    
+            access_logger.info(
+                f"[Public Link Created] User: {request.user.username} | IP: {ip} | File: {file.file.name} | Token: {share_link.token} | Expires: {share_link.expires_at} | UA: {user_agent} "
+            )
             return Response({"share_link": link_url}, status=status.HTTP_201_CREATED)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class PublicFileDownloadView(APIView):
     permission_classes = []
+    throttle_classes = [AnonRateThrottle, PublicLinkThrottle]
     
     def get(self, request, token):
+        ip = get_client_ip(request)
+        user_agent = request.META.get("HTTP_USER_AGENT", "unknown")
+        
         try: 
             link = PublicShareLink.objects.select_related("file").get(token=token)
             if link.is_expired():
+                access_logger.warning(
+                    f"[Expired Link Attemp] Token: {token} | IP: {ip} | UA: {user_agent}"
+                )
                 raise Http404("Link expired")
+            
+            access_logger.info(
+                f"[Public fiel Download] File: {link.file.file.name} | Token: {token} | IP: {ip} | UA: {user_agent}"
+                )
             return FileResponse(link.file.file.open("rb"), as_attachment=True, filename=link.file.file.name.split("/")[-1])
-        except PublicShareLink.DoesNotExist:
-            raise Http404("Invalid link")
         
+        except PublicShareLink.DoesNotExist:
+            access_logger.warning(
+                f"[Invalid token attemp] Token: {token} | IP: {ip} | UA: {user_agent}"
+                )
+            raise Http404("Invalid link")

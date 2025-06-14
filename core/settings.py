@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 import logging
+from logging.handlers import RotatingFileHandler
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -54,6 +55,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "core.middleware.access_log_middleware.AccessLogMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -131,13 +133,129 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+     "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.AnonRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "user": "200/minute",
+        "anon": "5/minute",
+        'public_link': '10/hour',
+    },
 }
-logging.basicConfig(
-    level=logging.WARNING,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-)
+
 
 CELERY_BROKER_URL = "redis://localhost:6379/0"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
+
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "formatters": {
+#         "verbose": {
+#             "format": "{asctime} [{levelname}] {name} {message}",
+#             "style": "{",
+#         },
+#     },
+#     "handlers": {
+#         "file": {
+#             "level": "INFO",
+#             "class": "logging.FileHandler",
+#             "filename": os.path.join(BASE_DIR, "access.log"),
+#             "formatter": "verbose",
+#         },
+#     },
+#     "loggers": {
+#         "access_logger": {
+#             "handlers": ["file"],
+#             "level": "INFO",
+#             "propagate": False,
+#         },
+#     },
+# }
+
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "handlers": {
+#         "access_file": {
+#             "level": "WARNING",
+#             "class": "logging.handlers.RotatingFileHandler",
+#             "filename": os.path.join(BASE_DIR, "logs/access.log"),
+#             "maxBytes": 1024 * 1024 * 2,
+#             "backupCount": 5,
+#             "formatter": "standard",
+#         },
+#         "error_fille": {
+#             "level": "ERROR",
+#             "class": "logging.handlers.RotatingFileHandler",
+#             "filename": os.path.join(BASE_DIR, "logs/error.log"),
+#             "maxBytes": 1024 * 1024 * 2,
+#             "backupCount": 5,
+#             "formatter": "standard",
+            
+#         },
+#     },
+#     "formatters": {
+#         "standard" : {
+#             "format" : "%(asctime)s [%(levelname)s] %(message)s"
+#         },
+#     },
+#     "loggers": {
+#         "access": {
+#             "handlers": ["access_file"],
+#             "level": "WARNING",
+#             "propagate": False,
+#         },
+#         "error": {
+#             "handlers": ["error_file"],
+#             "level": "ERROR",
+#             "propagate": False
+#         },
+#     },
+# }
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "default": {
+            "format": "%(asctime)s [%(levelname)s] %(message)s",
+        },
+    },
+    "handlers": {
+        "access_file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "default",
+            "filename": os.path.join(BASE_DIR, "logs", "access.log"),
+            "maxBytes": 1024 * 1024 * 2,  # 2 MB
+            "backupCount": 3,
+        },
+        "error_file": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "default",
+            "filename": os.path.join(BASE_DIR, "logs", "error.log"),
+            "maxBytes": 1024 * 1024 * 2,  # 2 MB
+            "backupCount": 3,
+        },
+    },
+    "loggers": {
+        "access": {
+            "handlers": ["access_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "error": {
+            "handlers": ["error_file"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+    },
+}

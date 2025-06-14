@@ -1,0 +1,30 @@
+[ACCESS DENIED] 2025-06-13 09:46:17.255376+00:00 | Path: /api/storage/test-auth/ | IP: 127.0.0.1 | Status: 404 | User: Anonymous
+2025-06-13 11:25:05,012 [INFO] Testing access logger
+2025-06-13 13:16:34,929 [WARNING] [ACCESS LOG] 2025-06-13 13:16:34.929592+00:00 | Path: /api/storage/share/7/ | Method: POST | IP: 127.0.0.1 | Status: 404 | User: testuser1
+2025-06-13 13:39:17,645 [WARNING] [ACCESS LOG] 2025-06-13 13:39:17.644980+00:00 | Path: /api/storage/shae/ | Method: POST | IP: 127.0.0.1 | Status: 404 | User: Anonymous
+2025-06-13 13:39:26,621 [WARNING] [ACCESS LOG] 2025-06-13 13:39:26.621478+00:00 | Path: /api/storage/shae/ | Method: POST | IP: 127.0.0.1 | Status: 404 | User: Anonymous
+2025-06-13 13:39:27,359 [WARNING] [ACCESS LOG] 2025-06-13 13:39:27.359447+00:00 | Path: /api/storage/shae/ | Method: POST | IP: 127.0.0.1 | Status: 404 | User: Anonymous
+2025-06-13 13:39:28,053 [WARNING] [ACCESS LOG] 2025-06-13 13:39:28.053530+00:00 | Path: /api/storage/shae/ | Method: POST | IP: 127.0.0.1 | Status: 404 | User: Anonymous
+2025-06-13 13:40:45,415 [WARNING] [ACCESS LOG] 2025-06-13 13:40:45.415142+00:00 | Path: /api/storage/download/13/ | Method: GET | IP: 127.0.0.1 | Status: 403 | User: testuser3
+2025-06-13 13:41:42,446 [WARNING] [ACCESS LOG] 2025-06-13 13:41:42.446702+00:00 | Path: /api/storage/download/13/ | Method: POST | IP: 127.0.0.1 | Status: 405 | User: testuser3
+2025-06-13 13:43:43,257 [WARNING] [ACCESS LOG] 2025-06-13 13:43:43.257185+00:00 | Path: /api/storage/download/13/ | Method: GET | IP: 127.0.0.1 | Status: 403 | User: testuser3
+2025-06-13 13:43:55,283 [WARNING] [ACCESS LOG] 2025-06-13 13:43:55.283400+00:00 | Path: /api/storage/public/366b20dd-2388-4ef7-8b2e-499518488f71/ | Method: GET | IP: 127.0.0.1 | Status: 404 | User: Anonymous
+2025-06-13 13:44:02,704 [WARNING] [ACCESS LOG] 2025-06-13 13:44:02.703744+00:00 | Path: /api/storage/share/3/ | Method: POST | IP: 127.0.0.1 | Status: 401 | User: Anonymous
+2025-06-14 09:17:19,971 [WARNING] [ACCESS LOG] 2025-06-14 09:17:19.971142+00:00 | Path: /api/storage/public/9d9a5951-0faf-46f4-bec9-d4d57cd2b11b/ | Method: GET | IP: 127.0.0.1 | Status: 404 | User: testuser
+2025-06-14 09:27:48,246 [WARNING] [ACCESS LOG] 2025-06-14 09:27:48.246742+00:00 | Path: /api/storage/public/da540528-da99-4ddf-8c81-b6593ef74b57/ | Method: GET | IP: 127.0.0.1 | Status: 404 | User: testuser
+2025-06-14 09:30:20,023 [WARNING] [ACCESS LOG] 2025-06-14 09:30:20.023279+00:00 | Path: /api/storage/public/020744d3-5ef2-4b15-b2cb-e7e718dcc843/ | Method: GET | IP: 127.0.0.1 | Status: 404 | User: testuser
+2025-06-14 09:30:20,498 [WARNING] [ACCESS LOG] 2025-06-14 09:30:20.498348+00:00 | Path: /api/storage/share/ | Method: POST | IP: 127.0.0.1 | Status: 400 | User: testuser
+2025-06-14 09:34:28,169 [WARNING] [ACCESS LOG] 2025-06-14 09:34:28.169451+00:00 | Path: /api/storage/public/cdcb64bf-8b20-486c-b5d2-99531a666b9f/ | Method: GET | IP: 127.0.0.1 | Status: 404 | User: testuser
+2025-06-14 09:34:28,679 [WARNING] [ACCESS LOG] 2025-06-14 09:34:28.679781+00:00 | Path: /api/storage/share/ | Method: POST | IP: 127.0.0.1 | Status: 400 | User: testuser
+2025-06-14 10:53:58,227 [WARNING] [ACCESS LOG] 2025-06-14 10:53:58.227069+00:00 | Path: /api/storage/public/2543fe1f-3f4a-48d4-b32c-00de8df80cd3/ | Method: GET | IP: 127.0.0.1 | Status: 404 | User: testuser
+2025-06-14 10:53:58,702 [WARNING] [ACCESS LOG] 2025-06-14 10:53:58.702324+00:00 | Path: /api/storage/share/ | Method: POST | IP: 127.0.0.1 | Status: 400 | User: testuser
+2025-06-14 10:54:23,112 [WARNING] [ACCESS LOG] 2025-06-14 10:54:23.112590+00:00 | Path: /api/storage/public/8c3364c8-4564-4593-8dbc-903c97eaa811/ | Method: GET | IP: 127.0.0.1 | Status: 404 | User: testuser
+2025-06-14 10:54:23,589 [WARNING] [ACCESS LOG] 2025-06-14 10:54:23.589614+00:00 | Path: /api/storage/share/ | Method: POST | IP: 127.0.0.1 | Status: 400 | User: testuser
+2025-06-14 10:54:51,644 [WARNING] [ACCESS LOG] 2025-06-14 10:54:51.644628+00:00 | Path: /api/storage/public/092af605-54e8-4f03-892c-80c25d35170c/ | Method: GET | IP: 127.0.0.1 | Status: 404 | User: testuser
+2025-06-14 10:54:52,124 [WARNING] [ACCESS LOG] 2025-06-14 10:54:52.124921+00:00 | Path: /api/storage/share/ | Method: POST | IP: 127.0.0.1 | Status: 400 | User: testuser
+2025-06-14 10:55:23,731 [WARNING] [ACCESS LOG] 2025-06-14 10:55:23.731432+00:00 | Path: /api/storage/share/ | Method: POST | IP: 127.0.0.1 | Status: 400 | User: testuser3
+2025-06-14 11:10:04,427 [WARNING] [ACCESS LOG] 2025-06-14 11:10:04.427404+00:00 | Path: /api/storage/public/64d403de-deba-4195-8342-4ea8d614dcad/ | Method: GET | IP: 127.0.0.1 | Status: 404 | User: testuser
+2025-06-14 11:14:47,393 [WARNING] [ACCESS LOG] 2025-06-14 11:14:47.393433+00:00 | Path: /api/storage/download/1/ | Method: GET | IP: 127.0.0.1 | Status: 403 | User: testuser
+2025-06-14 11:14:47,634 [WARNING] [ACCESS LOG] 2025-06-14 11:14:47.634464+00:00 | Path: /api/storage/public/2f36378b-d234-45ac-a6c1-ae09ef9878cb/ | Method: GET | IP: 127.0.0.1 | Status: 404 | User: testuser
+2025-06-14 11:20:43,476 [WARNING] [ACCESS LOG] 2025-06-14 11:20:43.476746+00:00 | Path: /api/storage/download/1/ | Method: GET | IP: 127.0.0.1 | Status: 403 | User: testuser
+2025-06-14 11:20:43,718 [WARNING] [ACCESS LOG] 2025-06-14 11:20:43.718077+00:00 | Path: /api/storage/public/a1b299d6-cb16-445b-b77d-01ce9a1e42e4/ | Method: GET | IP: 127.0.0.1 | Status: 404 | User: testuser
